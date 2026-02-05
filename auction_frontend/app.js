@@ -9,7 +9,7 @@ const ABI = [
 
 document.getElementById("connectBtn").onclick = connect;
 document.getElementById("bidBtn").onclick = bid;
-document.getElementById("endBtn").onclick = end;
+document.getElementById("endBtn").onclick = endAuction;
 
 async function connect() {
   provider = new ethers.BrowserProvider(window.ethereum);
@@ -17,10 +17,10 @@ async function connect() {
   signer = await provider.getSigner();
 
   auction = new ethers.Contract(AUCTION_ADDRESS, ABI, signer);
-  load();
+  loadAuction();
 }
 
-async function load() {
+async function loadAuction() {
   const [item, price, leader, deadline] = await auction.getAuction();
 
   document.getElementById("item").innerText = item;
@@ -32,16 +32,19 @@ async function load() {
 
 async function bid() {
   const eth = document.getElementById("bidInput").value;
+
   const tx = await auction.placeBid({
     value: ethers.parseEther(eth)
   });
-  document.getElementById("status").innerText = "Tx sent...";
+
+  document.getElementById("status").innerText = "Transaction sent...";
   await tx.wait();
-  load();
+  document.getElementById("status").innerText = "Bid placed!";
+  loadAuction();
 }
 
-async function end() {
+async function endAuction() {
   const tx = await auction.endAuction();
   await tx.wait();
-  alert("Auction ended");
+  document.getElementById("status").innerText = "Auction ended";
 }

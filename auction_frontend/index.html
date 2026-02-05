@@ -2,47 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Auction DApp</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>On-Chain Auction</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
 </head>
 <body>
 
 <header>
-  <h1>On-Chain Auction</h1>
+  <div class="logo">🔨 OnChainAuction</div>
   <button id="connectBtn">Connect Wallet</button>
 </header>
 
 <main>
-  <section class="auction-card">
-    <h2 id="item">—</h2>
+  <div class="auction-card">
 
-    <div class="info">
-      <div>
-        <span>Highest bid</span>
-        <strong id="price">—</strong> ETH
+    <h1 id="item">Auction Item</h1>
+
+    <div class="stats">
+      <div class="stat">
+        <span>Highest Bid</span>
+        <strong><span id="price">0</span> ETH</strong>
       </div>
 
-      <div>
+      <div class="stat">
         <span>Leader</span>
         <strong id="leader">—</strong>
       </div>
 
-      <div>
-        <span>Ends at</span>
+      <div class="stat">
+        <span>Ends At</span>
         <strong id="deadline">—</strong>
       </div>
     </div>
 
     <div class="bid-box">
-      <input type="number" id="bidInput" placeholder="ETH amount">
+      <input type="number" id="bidInput" placeholder="Amount in ETH">
       <button id="bidBtn">Place Bid</button>
     </div>
 
-    <button class="danger" id="endBtn">End Auction</button>
-  </section>
+    <button class="end-btn" id="endBtn">End Auction</button>
 
-  <p id="status"></p>
+    <p id="status"></p>
+
+  </div>
 </main>
 
 <script src="app.js"></script>
