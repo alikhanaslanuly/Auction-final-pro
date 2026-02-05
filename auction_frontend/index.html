@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auction DApp</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- ethers.js -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🔨 Auction DApp</h1>
+
+    <button id="connectBtn">Connect MetaMask</button>
+    <p id="account">Not connected</p>
+
+    <hr>
+
+    <h2>Auction Info</h2>
+    <p><b>Item:</b> <span id="item">-</span></p>
+    <p><b>Highest Bid:</b> <span id="price">-</span> ETH</p>
+    <p><b>Leader:</b> <span id="leader">-</span></p>
+    <p><b>Deadline:</b> <span id="deadline">-</span></p>
+    <p><b>Status:</b> <span id="status">-</span></p>
+
+    <button id="refreshBtn">Refresh Auction</button>
+
+    <hr>
+
+    <h2>Place Bid</h2>
+    <input id="bidAmount" type="number" placeholder="ETH amount">
+    <button id="bidBtn">Place Bid</button>
+
+    <hr>
+
+    <button id="endBtn">End Auction</button>
+
+    <p id="message"></p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
