@@ -62,7 +62,7 @@ contract Auction is ReentrancyGuard {
 
     constructor(address tokenAddress, uint256 _bidRewardPercent, uint256 _winnerBonus) {
         require(tokenAddress != address(0), "Token address is zero");
-        require(_bidRewardPercent <= 2000, "Reward too high");
+        require(_bidRewardPercent <= 20, "Reward too high");
         token = IAuctionToken(tokenAddress);
         bidRewardPercent = _bidRewardPercent;
         winnerBonus = _winnerBonus;
