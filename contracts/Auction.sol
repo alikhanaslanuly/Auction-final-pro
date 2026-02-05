@@ -42,7 +42,8 @@ contract Auction is ReentrancyGuard {
     event BidPlaced(
         uint256 indexed auctionId,
         address indexed bidder,
-        uint256 amount
+        uint256 amount,
+        uint256 rewardMinted
     );
 
     event AuctionEnded(
@@ -59,10 +60,12 @@ contract Auction is ReentrancyGuard {
         uint256 amount
     );
 
-    constructor(address tokenAddress) {
+    constructor(address tokenAddress, uint256 _bidRewardPercent, uint256 _winnerBonus) {
         require(tokenAddress != address(0), "Token address is zero");
-        require(bidRewardPercent <= 2000, "Reward too high");
+        require(_bidRewardPercent <= 2000, "Reward too high");
         token = IAuctionToken(tokenAddress);
+        bidRewardPercent = _bidRewardPercent;
+        winnerBonus = _winnerBonus;
     }
 
     function createAuction(
@@ -107,11 +110,11 @@ contract Auction is ReentrancyGuard {
 
         uint256 rewardMinted = 0;
         if (bidRewardPercent > 0) {
-            rewardMinted = (amount * bidRewardPercent) / 10000;
+            rewardMinted = (amount * bidRewardPercent) / 100;
             token.mintReward(msg.sender, rewardMinted);
         }
 
-        emit BidPlaced(auctionId, msg.sender, amount);
+        emit BidPlaced(auctionId, msg.sender, amount, rewardMinted);
     }
 
     function endAuction(uint256 auctionId) external nonReentrant {
