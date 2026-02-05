@@ -1,17 +1,21 @@
 {
-  "name": "blockchainfinal",
+  "name": "auction-final",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "hardhat compile",
+    "deploy:sepolia": "hardhat run scripts/deployAUC.js --network sepolia",
+    "clean": "hardhat clean"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^4.0.4",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.4",
+    "hardhat": "^3.0.0",
+    "typescript": "^5.6.3"
+  },
   "dependencies": {
-    "dotenv": "^17.2.3",
-    "hardhat": "^3.1.6"
+    "@openzeppelin/contracts": "^5.0.2"
   }
 }

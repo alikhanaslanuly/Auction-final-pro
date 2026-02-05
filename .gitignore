@@ -1,0 +1,30 @@
+# Node dependencies
+node_modules/
+
+# Environment variables (secrets)
+.env
+
+# Hardhat artifacts & cache
+artifacts/
+cache/
+
+# TypeChain generated files
+typechain-types/
+
+# Coverage reports (if used)
+coverage/
+coverage.json
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.swp
