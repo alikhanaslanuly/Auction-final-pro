@@ -24,8 +24,12 @@ contract AuctionToken is ERC20, Ownable {
         emit MinterUpdated(minter, isMinter);
     }
 
-    function mintReward(address to, uint256 amount) external onlyOwner {
+    modifier onlyMinter() {
         require(minters[msg.sender], "Not authorized");
+        _;
+    }
+
+    function mintReward(address to, uint256 amount) external onlyMinter {
         _mint(to, amount);
         emit RewardMinted(to, amount);
     }
