@@ -12,6 +12,8 @@ contract Auction is ReentrancyGuard {
     IAuctionToken public immutable token;
 
     uint256 public auctionCount;
+    uint256 public immutable bidRewardPercent; 
+    uint256 public immutable winnerBonus;
 
     struct AuctionData {
         string item;
@@ -47,7 +49,8 @@ contract Auction is ReentrancyGuard {
         uint256 indexed auctionId,
         address indexed winner,
         uint256 winningBid,
-        address indexed seller
+        address indexed seller,
+        uint256 bonusMinted
     );
 
     event RefundWithdrawn(
@@ -58,6 +61,7 @@ contract Auction is ReentrancyGuard {
 
     constructor(address tokenAddress) {
         require(tokenAddress != address(0), "Token address is zero");
+        require(bidRewardPercent <= 2000, "Reward too high");
         token = IAuctionToken(tokenAddress);
     }
 
@@ -101,6 +105,12 @@ contract Auction is ReentrancyGuard {
         a.highestBidder = msg.sender;
         a.highestBid = amount;
 
+        uint256 rewardMinted = 0;
+        if (bidRewardPercent > 0) {
+            rewardMinted = (amount * bidRewardPercent) / 10000;
+            token.mintReward(msg.sender, rewardMinted);
+        }
+
         emit BidPlaced(auctionId, msg.sender, amount);
     }
 
@@ -118,7 +128,13 @@ contract Auction is ReentrancyGuard {
             require(ok, "transfer to seller failed");
         }
 
-        emit AuctionEnded(auctionId, a.highestBidder, a.highestBid, a.seller);
+        uint256 bonusMinted = 0;
+        if (a.highestBidder != address(0) && winnerBonus > 0) {
+            bonusMinted = winnerBonus;
+            token.mintReward(a.highestBidder, bonusMinted);
+        }
+
+        emit AuctionEnded(auctionId, a.highestBidder, a.highestBid, a.seller, bonusMinted);
     }
 
     function withdrawRefund(uint256 auctionId) external nonReentrant {
