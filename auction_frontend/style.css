@@ -21,7 +21,9 @@ input {
   width: 100%;
   padding: 6px;
 }
-
+.citoo{
+    font-size: 10px;
+}
 hr {
   margin: 20px 0;
 }
