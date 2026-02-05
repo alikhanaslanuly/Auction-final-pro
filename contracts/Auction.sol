@@ -4,8 +4,12 @@ pragma solidity ^0.8.28;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+interface IAuctionToken is IERC20 {
+    function mintReward(address to, uint256 amount) external;
+}
+
 contract Auction is ReentrancyGuard {
-    IERC20 public immutable token;
+    IAuctionToken public immutable token;
 
     uint256 public auctionCount;
 
@@ -54,7 +58,7 @@ contract Auction is ReentrancyGuard {
 
     constructor(address tokenAddress) {
         require(tokenAddress != address(0), "Token address is zero");
-        token = IERC20(tokenAddress);
+        token = IAuctionToken(tokenAddress);
     }
 
     function createAuction(
