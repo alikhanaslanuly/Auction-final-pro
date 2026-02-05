@@ -3,44 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <title>Auction DApp</title>
-
-  <link rel="stylesheet" href="style.css">
-
-  <!-- ethers.js -->
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.10.0/dist/ethers.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
 </head>
 <body>
 
-  <div class="container">
-    <h1>🔨 Auction DApp</h1>
+<header>
+  <h1>On-Chain Auction</h1>
+  <button id="connectBtn">Connect Wallet</button>
+</header>
 
-    <button id="connectBtn">Connect MetaMask</button>
-    <p id="account">Not connected</p>
+<main>
+  <section class="auction-card">
+    <h2 id="item">—</h2>
 
-    <hr>
+    <div class="info">
+      <div>
+        <span>Highest bid</span>
+        <strong id="price">—</strong> ETH
+      </div>
 
-    <h2>Auction Info</h2>
-    <p><b>Item:</b> <span id="item">-</span></p>
-    <p><b>Highest Bid:</b> <span id="price">-</span> ETH</p>
-    <p><b>Leader:</b> <span id="leader">-</span></p>
-    <p><b>Deadline:</b> <span id="deadline">-</span></p>
-    <p><b>Status:</b> <span id="status">-</span></p>
+      <div>
+        <span>Leader</span>
+        <strong id="leader">—</strong>
+      </div>
 
-    <button id="refreshBtn">Refresh Auction</button>
+      <div>
+        <span>Ends at</span>
+        <strong id="deadline">—</strong>
+      </div>
+    </div>
 
-    <hr>
+    <div class="bid-box">
+      <input type="number" id="bidInput" placeholder="ETH amount">
+      <button id="bidBtn">Place Bid</button>
+    </div>
 
-    <h2>Place Bid</h2>
-    <input id="bidAmount" type="number" placeholder="ETH amount">
-    <button id="bidBtn">Place Bid</button>
+    <button class="danger" id="endBtn">End Auction</button>
+  </section>
 
-    <hr>
+  <p id="status"></p>
+</main>
 
-    <button id="endBtn">End Auction</button>
-    <h1></h1>
-    <p id="message"></p>
-  </div>
-
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

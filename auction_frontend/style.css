@@ -1,34 +1,63 @@
 body {
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
+  margin: 0;
+  font-family: Inter, sans-serif;
+  background: #0f172a;
+  color: #e5e7eb;
 }
 
-.container {
-  width: 400px;
-  margin: 40px auto;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 40px;
+  background: #020617;
 }
 
 button {
-  padding: 8px 12px;
-  margin-top: 5px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
-input {
-  width: 100%;
-  padding: 6px;
+button.danger {
+  background: #dc2626;
+  margin-top: 20px;
 }
-.citoo{
-    font-size: 10px;
+
+main {
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
 }
-hr {
+
+.auction-card {
+  background: #020617;
+  padding: 30px;
+  width: 380px;
+  border-radius: 16px;
+}
+
+.info {
+  display: grid;
+  gap: 12px;
   margin: 20px 0;
 }
 
-#message {
-  margin-top: 10px;
-  color: green;
+.bid-box {
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+}
+
+#status {
+  text-align: center;
+  margin-top: 20px;
 }
