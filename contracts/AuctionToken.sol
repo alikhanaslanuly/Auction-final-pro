@@ -9,11 +9,26 @@ contract AuctionToken is ERC20, Ownable {
     uint256 public constant FEE_DIVIDER = 1000;
     event TokensBought(address indexed buyer, uint256 ethSent, uint256 fee, uint256 tokensMinted);
     event WithdrawnFee(address indexed owner, uint256 amount);
+    event MinterUpdated(address indexed minter, bool isMinter);
+    event RewardMinted(address indexed to, uint256 amount);
+
+    mapping(address => bool) public minters;
 
     constructor(address initialOwner) 
         ERC20("Auction Token", "AUC")
         Ownable(initialOwner) 
     {}
+
+    function setMinter(address minter, bool isMinter) external onlyOwner {
+        minters[minter] = isMinter;
+        emit MinterUpdated(minter, isMinter);
+    }
+
+    function mintReward(address to, uint256 amount) external onlyOwner {
+        require(minters[msg.sender], "Not authorized");
+        _mint(to, amount);
+        emit RewardMinted(to, amount);
+    }
 
     function buyTokens() external payable {
         require(msg.value > 0, "Send ETH to buy tokens");
