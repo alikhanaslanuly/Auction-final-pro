@@ -7,8 +7,8 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log("Deployer:", deployer.address);
 
-  const BID_REWARD_PERCENT = 5; // 5% от ставки
-  const WINNER_BONUS = ethers.parseUnits("50", 18); // 50 токенов (если decimals=18)
+  const BID_REWARD_PERCENT = 5; 
+  const WINNER_BONUS = ethers.parseUnits("50", 18);
 
   const AuctionToken = await ethers.getContractFactory("AuctionToken");
   const token = await AuctionToken.deploy(deployer.address);
