@@ -17,8 +17,9 @@ contract Auction is ReentrancyGuard {
 
     struct AuctionData {
         string item;
-        uint256 startPrice;     
-        uint256 endTime;        
+        uint256 startPrice;
+        uint256 goal;      
+        uint256 endTime;
         bool ended;
 
         address seller;
@@ -31,11 +32,14 @@ contract Auction is ReentrancyGuard {
 
     mapping(uint256 => mapping(address => uint256)) public pendingReturns;
 
+    mapping(uint256 => mapping(address => uint256)) public contributions;
+
     event AuctionCreated(
         uint256 indexed auctionId,
         address indexed seller,
         string item,
         uint256 startPrice,
+        uint256 goal,
         uint256 endTime
     );
 
@@ -71,10 +75,12 @@ contract Auction is ReentrancyGuard {
     function createAuction(
         string calldata item,
         uint256 startPrice,
+        uint256 goal,
         uint256 durationSeconds
     ) external returns (uint256 auctionId) {
         require(bytes(item).length > 0, "Item is empty");
         require(startPrice > 0, "Start price must be > 0");
+        require(goal > 0, "Goal must be > 0");
         require(durationSeconds > 0, "Duration must be > 0");
 
         auctionId = ++auctionCount;
@@ -82,11 +88,12 @@ contract Auction is ReentrancyGuard {
         AuctionData storage a = auctions[auctionId];
         a.item = item;
         a.startPrice = startPrice;
+        a.goal = goal;
         a.endTime = block.timestamp + durationSeconds;
         a.ended = false;
         a.seller = msg.sender;
 
-        emit AuctionCreated(auctionId, msg.sender, item, startPrice, a.endTime);
+        emit AuctionCreated(auctionId, msg.sender, item, startPrice, goal, a.endTime);
     }
 
     function placeBid(uint256 auctionId, uint256 amount) external nonReentrant {
@@ -100,6 +107,8 @@ contract Auction is ReentrancyGuard {
 
         bool ok = token.transferFrom(msg.sender, address(this), amount);
         require(ok, "transferFrom failed");
+
+        contributions[auctionId][msg.sender] += amount;
 
         if (a.highestBidder != address(0)) {
             pendingReturns[auctionId][a.highestBidder] += a.highestBid;
@@ -157,5 +166,10 @@ contract Auction is ReentrancyGuard {
         if (auctionId == 0 || auctionId > auctionCount) return false;
         if (a.ended) return false;
         return block.timestamp < a.endTime;
+    }
+
+    function goalReached(uint256 auctionId) external view returns (bool) {
+        AuctionData storage a = auctions[auctionId];
+        return a.highestBid >= a.goal;
     }
 }
