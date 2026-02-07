@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Auction DApp</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="bg"></div>
+
+  <main class="wrap">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">A</div>
+        <div>
+          <h1>Auction</h1>
+          <p class="sub">Sepolia · ERC20-bids · Minimal UI</p>
+        </div>
+      </div>
+
+      <div class="wallet">
+        <button id="btnConnect" class="btn primary">Connect MetaMask</button>
+        <div class="walletMeta">
+          <div class="pill" id="pillNetwork">Network: —</div>
+          <div class="pill mono" id="pillAddress">—</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <div class="cardTitle">Token</div>
+        <div class="kv">
+          <div class="k">Token address</div>
+          <div class="v mono" id="tokenAddr"></div>
+          <div class="k">Auction address</div>
+          <div class="v mono" id="auctionAddr"></div>
+          <div class="k">Your token balance</div>
+          <div class="v mono" id="tokenBal">—</div>
+          <div class="k">Allowance to Auction</div>
+          <div class="v mono" id="tokenAllow">—</div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Approve amount (ATK)</label>
+            <input id="approveAmount" type="number" min="0" step="0.0001" placeholder="1000" />
+          </div>
+          <button id="btnApprove" class="btn">Approve</button>
+        </div>
+
+        <div class="hint">
+          Нужно <span class="mono">approve</span>, чтобы контракт аукциона мог делать
+          <span class="mono">transferFrom</span> при ставке.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardTitle">Create Auction</div>
+
+        <div class="field">
+          <label>Item</label>
+          <input id="item" type="text" placeholder="MacBook Pro 14" />
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Start price (ATK)</label>
+            <input id="startPrice" type="number" min="0" step="0.0001" placeholder="10" />
+          </div>
+          <div class="field">
+            <label>Goal (ATK)</label>
+            <input id="goal" type="number" min="0" step="0.0001" placeholder="50" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label>Duration (seconds)</label>
+            <input id="duration" type="number" min="1" step="1" placeholder="300" />
+          </div>
+          <button id="btnCreate" class="btn primary">Create</button>
+        </div>
+
+        <div class="hint">
+          После создания обнови список: кнопка <span class="mono">Refresh</span>.
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="cardHead">
+        <div>
+          <div class="cardTitle">Auctions</div>
+          <div class="sub">Читаем данные из контракта: <span class="mono">auctionCount</span> и <span class="mono">auctions(id)</span></div>
+        </div>
+
+        <div class="cardActions">
+          <button id="btnRefresh" class="btn">Refresh</button>
+        </div>
+      </div>
+
+      <div id="auctionList" class="list">
+        <div class="empty">No auctions loaded yet. Click Refresh.</div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div id="status" class="status">Ready.</div>
+      <div class="tiny">
+        Tip: если транзакции не проходят — проверь, что в MetaMask выбрана <b>Sepolia</b> и есть SepoliaETH на газ.
+      </div>
+    </footer>
+  </main>
+
+  <!-- ethers v6 UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.16.0/dist/ethers.umd.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

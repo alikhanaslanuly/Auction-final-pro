@@ -1,21 +1,22 @@
 import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-ethers";
+import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 
 dotenv.config();
 
 const config: HardhatUserConfig = {
-  solidity: {
-    version: "0.8.28",
-    settings: {
-      optimizer: { enabled: true, runs: 200 }
-    }
-  },
+  solidity: "0.8.28",
   networks: {
     sepolia: {
-      type: "http",
-      url: process.env.SEPOLIA_RPC_URL || "",
-      accounts: process.env.SEPOLIA_PRIVATE_KEY ? [process.env.SEPOLIA_PRIVATE_KEY] : []
+      url: process.env.SEPOLIA_RPC_URL!,
+      accounts: [process.env.SEPOLIA_PRIVATE_KEY!]
+    },
+    holesky: {
+      url: process.env.HOLESKY_RPC_URL!,
+      accounts: [process.env.SEPOLIA_PRIVATE_KEY!]
+    },
+    localhost: {
+      url: "http://127.0.0.1:8545"
     }
   }
 };

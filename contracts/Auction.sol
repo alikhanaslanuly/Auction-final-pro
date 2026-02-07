@@ -4,15 +4,22 @@ pragma solidity ^0.8.28;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+interface IAuctionToken is IERC20 {
+    function mintReward(address to, uint256 amount) external;
+}
+
 contract Auction is ReentrancyGuard {
-    IERC20 public immutable token;
+    IAuctionToken public immutable token;
 
     uint256 public auctionCount;
+    uint256 public immutable bidRewardPercent; 
+    uint256 public immutable winnerBonus;
 
     struct AuctionData {
         string item;
-        uint256 startPrice;     
-        uint256 endTime;        
+        uint256 startPrice;
+        uint256 goal;      
+        uint256 endTime;
         bool ended;
 
         address seller;
@@ -25,25 +32,30 @@ contract Auction is ReentrancyGuard {
 
     mapping(uint256 => mapping(address => uint256)) public pendingReturns;
 
+    mapping(uint256 => mapping(address => uint256)) public contributions;
+
     event AuctionCreated(
         uint256 indexed auctionId,
         address indexed seller,
         string item,
         uint256 startPrice,
+        uint256 goal,
         uint256 endTime
     );
 
     event BidPlaced(
         uint256 indexed auctionId,
         address indexed bidder,
-        uint256 amount
+        uint256 amount,
+        uint256 rewardMinted
     );
 
     event AuctionEnded(
         uint256 indexed auctionId,
         address indexed winner,
         uint256 winningBid,
-        address indexed seller
+        address indexed seller,
+        uint256 bonusMinted
     );
 
     event RefundWithdrawn(
@@ -52,18 +64,23 @@ contract Auction is ReentrancyGuard {
         uint256 amount
     );
 
-    constructor(address tokenAddress) {
+    constructor(address tokenAddress, uint256 _bidRewardPercent, uint256 _winnerBonus) {
         require(tokenAddress != address(0), "Token address is zero");
-        token = IERC20(tokenAddress);
+        require(_bidRewardPercent <= 20, "Reward too high");
+        token = IAuctionToken(tokenAddress);
+        bidRewardPercent = _bidRewardPercent;
+        winnerBonus = _winnerBonus;
     }
 
     function createAuction(
         string calldata item,
         uint256 startPrice,
+        uint256 goal,
         uint256 durationSeconds
     ) external returns (uint256 auctionId) {
         require(bytes(item).length > 0, "Item is empty");
         require(startPrice > 0, "Start price must be > 0");
+        require(goal > 0, "Goal must be > 0");
         require(durationSeconds > 0, "Duration must be > 0");
 
         auctionId = ++auctionCount;
@@ -71,11 +88,12 @@ contract Auction is ReentrancyGuard {
         AuctionData storage a = auctions[auctionId];
         a.item = item;
         a.startPrice = startPrice;
+        a.goal = goal;
         a.endTime = block.timestamp + durationSeconds;
         a.ended = false;
         a.seller = msg.sender;
 
-        emit AuctionCreated(auctionId, msg.sender, item, startPrice, a.endTime);
+        emit AuctionCreated(auctionId, msg.sender, item, startPrice, goal, a.endTime);
     }
 
     function placeBid(uint256 auctionId, uint256 amount) external nonReentrant {
@@ -90,6 +108,8 @@ contract Auction is ReentrancyGuard {
         bool ok = token.transferFrom(msg.sender, address(this), amount);
         require(ok, "transferFrom failed");
 
+        contributions[auctionId][msg.sender] += amount;
+
         if (a.highestBidder != address(0)) {
             pendingReturns[auctionId][a.highestBidder] += a.highestBid;
         }
@@ -97,7 +117,13 @@ contract Auction is ReentrancyGuard {
         a.highestBidder = msg.sender;
         a.highestBid = amount;
 
-        emit BidPlaced(auctionId, msg.sender, amount);
+        uint256 rewardMinted = 0;
+        if (bidRewardPercent > 0) {
+            rewardMinted = (amount * bidRewardPercent) / 100;
+            token.mintReward(msg.sender, rewardMinted);
+        }
+
+        emit BidPlaced(auctionId, msg.sender, amount, rewardMinted);
     }
 
     function endAuction(uint256 auctionId) external nonReentrant {
@@ -114,7 +140,13 @@ contract Auction is ReentrancyGuard {
             require(ok, "transfer to seller failed");
         }
 
-        emit AuctionEnded(auctionId, a.highestBidder, a.highestBid, a.seller);
+        uint256 bonusMinted = 0;
+        if (a.highestBidder != address(0) && winnerBonus > 0) {
+            bonusMinted = winnerBonus;
+            token.mintReward(a.highestBidder, bonusMinted);
+        }
+
+        emit AuctionEnded(auctionId, a.highestBidder, a.highestBid, a.seller, bonusMinted);
     }
 
     function withdrawRefund(uint256 auctionId) external nonReentrant {
@@ -134,5 +166,10 @@ contract Auction is ReentrancyGuard {
         if (auctionId == 0 || auctionId > auctionCount) return false;
         if (a.ended) return false;
         return block.timestamp < a.endTime;
+    }
+
+    function goalReached(uint256 auctionId) external view returns (bool) {
+        AuctionData storage a = auctions[auctionId];
+        return a.highestBid >= a.goal;
     }
 }
