@@ -12,13 +12,14 @@ contract Auction is ReentrancyGuard {
     IAuctionToken public immutable token;
 
     uint256 public auctionCount;
+
     uint256 public immutable bidRewardPercent; 
-    uint256 public immutable winnerBonus;
+    uint256 public immutable winnerBonus;   
 
     struct AuctionData {
         string item;
         uint256 startPrice;
-        uint256 goal;      
+        uint256 goal;
         uint256 endTime;
         bool ended;
 
@@ -29,9 +30,7 @@ contract Auction is ReentrancyGuard {
     }
 
     mapping(uint256 => AuctionData) public auctions;
-
     mapping(uint256 => mapping(address => uint256)) public pendingReturns;
-
     mapping(uint256 => mapping(address => uint256)) public contributions;
 
     event AuctionCreated(
@@ -66,7 +65,7 @@ contract Auction is ReentrancyGuard {
 
     constructor(address tokenAddress, uint256 _bidRewardPercent, uint256 _winnerBonus) {
         require(tokenAddress != address(0), "Token address is zero");
-        require(_bidRewardPercent <= 20, "Reward too high");
+        require(_bidRewardPercent <= 20, "Reward too high"); // чтобы не было абсурдных наград
         token = IAuctionToken(tokenAddress);
         bidRewardPercent = _bidRewardPercent;
         winnerBonus = _winnerBonus;
@@ -120,6 +119,8 @@ contract Auction is ReentrancyGuard {
         uint256 rewardMinted = 0;
         if (bidRewardPercent > 0) {
             rewardMinted = (amount * bidRewardPercent) / 100;
+
+            require(rewardMinted > 0, "Reward too small");
             token.mintReward(msg.sender, rewardMinted);
         }
 
@@ -150,6 +151,8 @@ contract Auction is ReentrancyGuard {
     }
 
     function withdrawRefund(uint256 auctionId) external nonReentrant {
+        require(auctionId > 0 && auctionId <= auctionCount, "Auction not found");
+
         uint256 amount = pendingReturns[auctionId][msg.sender];
         require(amount > 0, "No refund available");
 

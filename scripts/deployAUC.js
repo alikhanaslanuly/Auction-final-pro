@@ -1,39 +1,34 @@
-const hre = require("hardhat");
-require("dotenv").config();
+import * as dotenv from "dotenv";
+import hre from "hardhat";
+const { ethers } = hre;
+
+dotenv.config();
 
 async function main() {
-  const [deployer] = await hre.ethers.getSigners();
+  const [deployer] = await ethers.getSigners();
   console.log("Deployer:", deployer.address);
 
-  // Deploy Token
-  const Token = await hre.ethers.getContractFactory("AuctionToken");
-  const token = await Token.deploy(
-    "AuctionToken",
-    "ATK",
-    hre.ethers.parseEther("1000000")
-  );
+  const BID_REWARD_PERCENT = 5; 
+  const WINNER_BONUS = ethers.parseUnits("50", 18);
+
+  const AuctionToken = await ethers.getContractFactory("AuctionToken");
+  const token = await AuctionToken.deploy(deployer.address);
   await token.waitForDeployment();
+  console.log("AuctionToken:", token.target);
 
-  const tokenAddress = await token.getAddress();
-  console.log("TOKEN_ADDRESS =", tokenAddress);
-
-  // Deploy Auction
-  const Auction = await hre.ethers.getContractFactory("Auction");
-  const auction = await Auction.deploy(
-    tokenAddress,
-    5,
-    hre.ethers.parseEther("100")
-  );
+  const Auction = await ethers.getContractFactory("Auction");
+  const auction = await Auction.deploy(token.target, BID_REWARD_PERCENT, WINNER_BONUS);
   await auction.waitForDeployment();
+  console.log("Auction:", auction.target);
 
-  const auctionAddress = await auction.getAddress();
-  console.log("AUCTION_ADDRESS =", auctionAddress);
-
-  // Link token -> auction
-  const tx = await token.setAuctionContract(auctionAddress);
+  const tx = await token.setMinter(auction.target, true);
   await tx.wait();
+  console.log("setMinter(Auction, true) done:", tx.hash);
 
-  console.log("Linked token to auction ✅");
+  console.log("TOKEN_ADDRESS =", token.target);
+  console.log("AUCTION_ADDRESS =", auction.target);
+  console.log("BID_REWARD_PERCENT =", BID_REWARD_PERCENT);
+  console.log("WINNER_BONUS =", WINNER_BONUS.toString());
 }
 
 main().catch((e) => {

@@ -8,5 +8,5 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["hardhat.config.ts", "scripts", "test", "typechain-types"]
+  "include": ["hardhat.config.js", "scripts", "test", "typechain-types"]
 }
